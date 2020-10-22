@@ -68,6 +68,7 @@ public class TDTestInterceptor implements PublishInboundInterceptor {
 
                 logger.info("mqttloader receive data：" + s0);
                 String clientId = publishInboundInput.getClientInformation().getClientId();
+                // 接收上报的动态 时间参数，其他参数固定
                 String station ="V20201022";
                 String[] data = new String[]{station,"测试",s0, String.valueOf(new Random().nextInt(50))};
                 RainStation.txtSave2DB(data);
