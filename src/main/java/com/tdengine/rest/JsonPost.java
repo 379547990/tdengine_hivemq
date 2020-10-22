@@ -28,7 +28,7 @@ public class JsonPost {
 			HttpPost httpPost = new HttpPost(ReadProperties.read("REST_URL"));
 
 			//第三步：给httpPost设置JSON格式的参数
-			StringEntity requestEntity = new StringEntity(sql, "utf-8");
+			StringEntity requestEntity = new StringEntity(sql, "UTF-8");
 			requestEntity.setContentEncoding("UTF-8");
 
 			 if( base64 == null){

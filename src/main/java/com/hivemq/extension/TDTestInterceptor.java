@@ -28,6 +28,7 @@ import com.hivemq.extension.sdk.api.interceptor.unsubscribe.UnsubscribeInboundIn
 import com.hivemq.extension.sdk.api.packets.publish.ModifiablePublishPacket;
 import com.hivemq.extension.sdk.api.packets.publish.PublishPacket;
 import com.tdengine.jdbc.RainStation;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -36,6 +37,10 @@ import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.sql.Timestamp;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Random;
 
 /**
  *
@@ -54,6 +59,21 @@ public class TDTestInterceptor implements PublishInboundInterceptor {
         final ModifiablePublishPacket publishPacket = publishInboundOutput.getPublishPacket();
         if ("td/test".equals(publishPacket.getTopic())) {
             try {
+                // mqttloader 测试, 只传时间搓
+                ByteBuffer buffer = publishPacket.getPayload().get();
+               // String s0 = String.valueOf( buffer.getLong());
+                Timestamp tm = new Timestamp(buffer.getLong());
+                var formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
+                String s0 = tm.toLocalDateTime().format(formatter);
+
+                logger.info("mqttloader receive data：" + s0);
+                String clientId = publishInboundInput.getClientInformation().getClientId();
+                String station ="v"+clientId.substring(clientId.lastIndexOf("-")+1);
+                String[] data = new String[]{station,"测试",s0, String.valueOf(new Random().nextInt(50))};
+                RainStation.txtSave2DB(data);
+
+                /*
+                // mqttx 客户端测试
                 Charset charset = Charset.defaultCharset() ;//Charset.forName("gb2312");// Charset.defaultCharset();   utf-8,gbk,gb2312
                 CharBuffer charBuffer = charset.decode(publishPacket.getPayload().get() );
                 String s = charBuffer.toString();
@@ -69,13 +89,14 @@ public class TDTestInterceptor implements PublishInboundInterceptor {
                 logger.info("GBK receive data：" + s3);
                 String  s4 = new String(b,"ISO-8859-1");
                 logger.info("ISO-8859-1 receive data：" + s4);
-
-                String[] data = s.split(",");
+                String[] data = s0.split(",");
                 RainStation.txtSave2DB(data);
+               */
+
             } catch (IOException ex) {
-                logger.error(ex.getMessage());
+                logger.error(ex.getMessage()+ ex.getStackTrace());
             } catch (Exception ex) {
-                logger.error(ex.getMessage());
+                logger.error(ex.getMessage() + ex.getStackTrace());
             }
             final ByteBuffer payload = ByteBuffer.wrap("Hello World!".getBytes(StandardCharsets.UTF_8));
             publishPacket.setPayload(payload);

@@ -8,11 +8,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.io.*;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.Date;
 
 
 /**
@@ -35,7 +34,7 @@ public class RainStation {
 			String tType = tCode.indexOf("V") > -1 ? "2" : "1";
 			String rainFall = paramsArray[3];
 		    String sql = " insert into rainstation.S_" + tCode + " using rainstation.monitoring tags('" + tCode + "','" + tName + "','" + tType + "' )  (ts,rainfall) values ('" + ts + "','" + rainFall + "') ";
-
+		    logger.info("【sql:】"+sql);
             String ServerType = ReadProperties.read("STYPE");
             if("db".equals(ServerType)){
 				executeUpdate(sql);
@@ -77,9 +76,15 @@ public class RainStation {
 		//
 		//System.out.println(filesList.size());
 		//
-        logger.info("开始："+new Date().toLocaleString());
+		Timestamp tm = new Timestamp(1603334720796L);
+		String s0 = String.valueOf(tm.toLocalDateTime());
+        logger.info("开始："+s0+"   ---"  );
+
+		var formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
+		String s1 = tm.toLocalDateTime().format(formatter);
+		logger.info("开始："+s1+"  ---  "  );
 		String[] paramsArray = {"V00003","其他站点","2020-10-08 23:19:20.126","10"};
-		txtSave2DB(  paramsArray);
+		//txtSave2DB(  paramsArray);
 
 		logger.info("结束："+new Date().toLocaleString());
 
